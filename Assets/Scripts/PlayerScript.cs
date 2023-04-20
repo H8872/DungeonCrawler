@@ -16,7 +16,7 @@ public class PlayerScript : MonoBehaviour
     {
         anim = transform.GetComponent<Animator>();
         rb = transform.GetComponent<Rigidbody2D>();
-        attackPivot = transform.GetChild(1);
+        attackPivot = transform.GetChild(0);
 
         lookAt = Vector3.right;
         anim.SetFloat("xInput", Mathf.Round(lookAt.x));
@@ -33,7 +33,7 @@ public class PlayerScript : MonoBehaviour
         yinput = (Mathf.Round((yinput*10)/5)*5)/10;
 
 
-        inputDirection = new Vector3(xinput,yinput,0);
+        inputDirection = new Vector3(xinput,yinput);
         inputDirection = Vector3.ClampMagnitude(inputDirection, 1);
 
         if(inputDirection == Vector3.zero)
@@ -79,7 +79,8 @@ public class PlayerScript : MonoBehaviour
             //anim.Play("Gobbo_Attack");
             attackTimer = attackCd;
             anim.SetFloat("Attack",attackTimer);
-            attackPivot.position = transform.position + lookAt * 1.5f;
+            attackPivot.position = transform.position + lookAt * 0.7f;
+            rb.AddForce(lookAt*moveSpeed*5, ForceMode2D.Impulse);
             if(lookAt.x > 0)
                 anim.Play("Gobbo_Attack_Left");
             else if(lookAt.y == 1)

@@ -6,8 +6,7 @@ public class LevelManager : MonoBehaviour
 {
     Camera mainCamera;
     Transform player;
-    float levelHeight, levelWidth;
-    [SerializeField] float tstx, tsty;
+    float levelHeight, levelWidth, xpos, ypos;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,9 +21,8 @@ public class LevelManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        tstx = Mathf.Floor((player.position.x + levelWidth/2)/levelWidth);
-        tsty = Mathf.Floor((player.position.y + levelHeight/2)/levelHeight);
-
+        if(Vector3.Distance(mainCamera.transform.parent.position,player.position)>0.2f)
+        mainCamera.transform.parent.position = Vector3.Lerp(mainCamera.transform.parent.position,player.position,6 * Time.deltaTime);
         //MoveCamera(tstx, tsty);
     }
     void MoveCamera(float x, float y)
