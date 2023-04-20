@@ -15,7 +15,7 @@ public class LevelManager : MonoBehaviour
         if(player == null)
             Debug.LogError("No player found in " + this);
         levelHeight = mainCamera.orthographicSize * 2;
-        levelWidth = levelHeight * 1.5f;
+        levelWidth = levelHeight * mainCamera.aspect;
     }
 
     // Update is called once per frame
