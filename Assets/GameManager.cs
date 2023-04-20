@@ -5,8 +5,8 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     enum ScripType {MatrixOfAssets, EnemyNames, None}
-    [SerializeField] ScripType scripType;
-    [SerializeField] List<string> nameList;
+    [SerializeField] ScripType scripType = ScripType.None;
+    [SerializeField] List<string> nameList = new List<string>();
     [SerializeField] int length, width;
     [SerializeField] GameObject cube;
 
@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Excersizes (Delete on final)
+        // Excersizes (Delete references on final)
         switch (scripType)
         {
             case ScripType.MatrixOfAssets:
@@ -35,11 +35,27 @@ public class GameManager : MonoBehaviour
                 {
                     RemoveLastName();
                 }
+                foreach(string s in nameList)
+                {
+                    if(s[0] == 'S' || s[0] == 's')
+                    {
+                        Debug.Log(s);
+                    }
+                }
                 break;
             default:
                 break;
         }
 
+        // Game Code
+
+    }
+
+
+    // Update is called once per frame
+    void Update()
+    {
+        
     }
 
     void AddName(string name)
@@ -57,11 +73,5 @@ public class GameManager : MonoBehaviour
         }
         else
             Debug.Log("No Names to remove");
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
