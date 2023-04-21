@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
-    enum PlayerState {Hurt, Idle, Moving}
+    enum PlayerState {Idle, Hurt, Moving}
     [SerializeField] PlayerState playerState;
-    [SerializeField] float hp, rollCd, attackCd, moveSpeed;
+    [SerializeField] float hp, rollCd, moveSpeed;
     Animator anim;
     Rigidbody2D rb;
     Transform attackPivot;
-    float rollTimer, attackTimer, xinput, yinput;
+    WeaponScript weapon;
+    float rollTimer, attackTimer, attackCd, xinput, yinput;
     Vector3 inputDirection, lookAt;
 
     // Start is called before the first frame update
@@ -19,6 +20,14 @@ public class PlayerScript : MonoBehaviour
         anim = transform.GetComponent<Animator>();
         rb = transform.GetComponent<Rigidbody2D>();
         attackPivot = transform.GetChild(0);
+        weapon = attackPivot.GetChild(0).GetComponent<WeaponScript>();
+        if(weapon == null)
+            Debug.LogError("Ples gib wepon D:");
+        else
+        {
+            attackCd = weapon.AttackSpeed;
+
+        }
 
         lookAt = Vector3.right;
         anim.SetFloat("xInput", Mathf.Round(lookAt.x));

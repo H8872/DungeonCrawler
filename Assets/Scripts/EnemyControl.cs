@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class EnemyControl : MonoBehaviour
 {
-    enum EnemyState {Hurt, Chasing, Idle, Moving}
+    enum EnemyState {Idle, Chasing, Hurt, Moving}
     [SerializeField] EnemyState enemyState;
     [SerializeField] float hp, moveSpeed;
-    float chaseTimer, chaseMax = 2f;
+    SpriteRenderer sprite;
+    float chaseTimer, chaseMax = 2f, dist;
     GameObject targetObject;
     Vector3 waypoint;
     bool playerDetected = false, playerInRange = false;
@@ -16,14 +17,19 @@ public class EnemyControl : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        sprite = transform.GetComponent<SpriteRenderer>();
         waypoint = transform.position;
         rb = transform.GetComponent<Rigidbody2D>();
+        dist = transform.GetComponent<CircleCollider2D>().radius;
         enemyState = EnemyState.Idle;
     }
 
     // Update is called once per frame
     void Update()
     {
+        
+
+        chaseTimer -= Time.deltaTime;
         switch (enemyState)
         {
             case EnemyState.Idle:
@@ -33,7 +39,6 @@ public class EnemyControl : MonoBehaviour
                 break;
 
             case EnemyState.Chasing:
-                chaseTimer -= Time.deltaTime;
                 if(playerInRange)
                 {
                     chaseTimer = chaseMax;
@@ -53,7 +58,11 @@ public class EnemyControl : MonoBehaviour
                 break;
 
             case EnemyState.Moving:
-                
+                if(rb.velocity == Vector2.zero)
+                {
+                    enemyState = EnemyState.Idle;
+                    break;
+                }
                 if(playerInRange)
                 {
                     enemyState = EnemyState.Chasing;
@@ -67,6 +76,10 @@ public class EnemyControl : MonoBehaviour
                 }
                 break;
 
+            case EnemyState.Hurt:
+                sprite.color = Color.red;
+                break;
+
             default:
                 break;
         }
@@ -74,12 +87,12 @@ public class EnemyControl : MonoBehaviour
         {
             waypoint = targetObject.transform.position;
         }
-        
     }
 
     private void FixedUpdate()
     {
-        rb.AddForce((waypoint-transform.position).normalized * moveSpeed,ForceMode2D.Impulse);
+        if(enemyState != EnemyState.Hurt)
+            rb.AddForce((waypoint-transform.position).normalized * moveSpeed,ForceMode2D.Impulse);
     }
 
     public void SetWaypoint(Vector3 target)
@@ -94,7 +107,6 @@ public class EnemyControl : MonoBehaviour
         targetObject = other;
         if(other.tag == "Player")
         {
-            Debug.Log(LoS);
             // If Line of Sight
             if(LoS)
             {
@@ -114,5 +126,56 @@ public class EnemyControl : MonoBehaviour
                 playerInRange = false;
             }
         }
+    }
+
+    void CheckLiving()
+    {
+        Debug.Log("checkd");
+        if(hp>0)
+        {   
+            enemyState = EnemyState.Idle;
+            sprite.color = Color.white;
+        }
+        else
+            Destroy(gameObject);
+    }
+
+    
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if(other.tag == "Player")
+        {
+            bool LoS = true;
+
+            //Checking Line of Sight on player
+            RaycastHit2D[] hitList = Physics2D.RaycastAll(transform.position,(other.transform.position-transform.position).normalized,dist);
+            foreach(RaycastHit2D h in hitList)
+            {
+                if(h.transform.tag == "Player")
+                    break;
+                else if(h.transform.tag == "WallCollider")
+                    LoS = false;
+            }
+
+            if(LoS)
+                HandleDetection(other.gameObject, true, true);
+            else
+                HandleDetection(other.gameObject, true, false);
+        }
+    }
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if(other.tag == "Player")
+        {
+            HandleDetection(other.gameObject, false, false);
+        }
+    }
+
+    private void OnDrawGizmos() {
+
+        // To waypoint
+        Gizmos.color = Color.red;
+        Gizmos.DrawCube(waypoint,new Vector3(0.2f,0.2f,0.2f));
+        Gizmos.DrawLine(transform.position,waypoint);
     }
 }

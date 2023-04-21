@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - WallCollider
+  - Weapon
   layers:
   - Default
   - TransparentFX
