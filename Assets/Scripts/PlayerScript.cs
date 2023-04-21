@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
+    enum PlayerState {Hurt, Idle, Moving}
+    [SerializeField] PlayerState playerState;
     [SerializeField] float hp, rollCd, attackCd, moveSpeed;
     Animator anim;
     Rigidbody2D rb;
@@ -38,10 +40,12 @@ public class PlayerScript : MonoBehaviour
 
         if(inputDirection == Vector3.zero)
         {
+            playerState = PlayerState.Idle;
             anim.SetBool("Walkin", false);
         }
         else 
         {
+            playerState = PlayerState.Moving;
             anim.SetBool("Walkin", true);
             lookAt = inputDirection.normalized;
             anim.SetFloat("xInput", Mathf.Round(lookAt.x));

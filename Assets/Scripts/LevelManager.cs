@@ -25,8 +25,4 @@ public class LevelManager : MonoBehaviour
         mainCamera.transform.parent.position = Vector3.Lerp(mainCamera.transform.parent.position,player.position,6 * Time.deltaTime);
         //MoveCamera(tstx, tsty);
     }
-    void MoveCamera(float x, float y)
-    {
-        mainCamera.transform.position = new Vector3(x*levelWidth, y*levelHeight, -10f);
-    }
 }
