@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pathfinding;
 
 public class EnemyControl : MonoBehaviour
 {
@@ -10,73 +11,78 @@ public class EnemyControl : MonoBehaviour
     SpriteRenderer sprite;
     float chaseTimer, chaseMax = 2f, dist;
     GameObject targetObject;
-    Vector3 waypoint;
+    Vector3 waypoint, home;
     bool playerDetected = false, playerInRange = false;
     Rigidbody2D rb;
+    AIPath ai;
+    AIDestinationSetter dSetter;
+    Transform moveTo;
 
     // Start is called before the first frame update
     void Start()
     {
         sprite = transform.GetComponent<SpriteRenderer>();
+        moveTo = new GameObject().transform;
+        moveTo.name = gameObject.name + "MoveTo";
+        moveTo.position = transform.position;
         waypoint = transform.position;
+        home = transform.position;
         rb = transform.GetComponent<Rigidbody2D>();
         dist = transform.GetComponent<CircleCollider2D>().radius;
+        ai = transform.GetComponent<AIPath>();
+        ai.maxSpeed = moveSpeed * 4;
+        dSetter = transform.GetComponent<AIDestinationSetter>();
         enemyState = EnemyState.Idle;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-
-        chaseTimer -= Time.deltaTime;
         switch (enemyState)
         {
             case EnemyState.Idle:
+                ai.canMove = true;
                 targetObject = gameObject;
+                chaseTimer -= Time.deltaTime;
                 if(playerDetected)
                     enemyState = EnemyState.Chasing;
+                if(chaseTimer<0)
+                {
+                    playerDetected = false;
+                    moveTo.position = home;
+                }
                 break;
 
             case EnemyState.Chasing:
+                ai.canMove = false;
+                moveTo.position = targetObject.transform.position;
                 if(playerInRange)
                 {
                     chaseTimer = chaseMax;
                 }
-                else if(chaseTimer<0)
-                {
-                    targetObject = gameObject;
-                    playerDetected = false;
-                    enemyState = EnemyState.Idle;
-                }
                 else
                 {
                     waypoint = targetObject.transform.position;
+                    moveTo.position = targetObject.transform.position;
                     targetObject = null;
                     enemyState = EnemyState.Moving;
                 }
                 break;
 
             case EnemyState.Moving:
-                if(rb.velocity == Vector2.zero)
-                {
+                ai.canMove = true;
+                dSetter.target = moveTo;
+                if(ai.reachedEndOfPath)
                     enemyState = EnemyState.Idle;
-                    break;
-                }
                 if(playerInRange)
                 {
                     enemyState = EnemyState.Chasing;
                     break;
                 }
-                targetObject = null;
-                if((waypoint-transform.position).magnitude < 0.1f)
-                {
-                    playerDetected = false;
-                    enemyState = EnemyState.Idle;
-                }
                 break;
 
             case EnemyState.Hurt:
+                ai.canMove = false;
                 sprite.color = Color.red;
                 break;
 
@@ -91,25 +97,19 @@ public class EnemyControl : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(enemyState != EnemyState.Hurt)
+        if(enemyState != EnemyState.Hurt && enemyState != EnemyState.Moving)
             rb.AddForce((waypoint-transform.position).normalized * moveSpeed,ForceMode2D.Impulse);
-    }
 
-    public void SetWaypoint(Vector3 target)
-    {
-        targetObject = null;
-        waypoint = target;
-        enemyState = EnemyState.Moving;
     }
 
     public void HandleDetection(GameObject other, bool inRange, bool LoS)
     {
-        targetObject = other;
         if(other.tag == "Player")
         {
             // If Line of Sight
             if(LoS)
             {
+                targetObject = other;
                 playerDetected = true;
                 if(inRange)
                 {
@@ -130,7 +130,6 @@ public class EnemyControl : MonoBehaviour
 
     void CheckLiving()
     {
-        Debug.Log("checkd");
         if(hp>0)
         {   
             enemyState = EnemyState.Idle;
@@ -138,6 +137,18 @@ public class EnemyControl : MonoBehaviour
         }
         else
             Destroy(gameObject);
+    }
+
+    public void GetHit(float dmg, float kb, Vector3 dir)
+    {
+        if(enemyState != EnemyState.Hurt)
+        {
+            CancelInvoke("CheckLiving");
+            Invoke("CheckLiving", 0.5f);
+            hp -= dmg;
+            enemyState = EnemyState.Hurt;
+            rb.AddForce((transform.position-dir).normalized * kb,ForceMode2D.Impulse);
+        }
     }
 
     

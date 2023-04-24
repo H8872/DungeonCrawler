@@ -11,6 +11,7 @@ public class PlayerScript : MonoBehaviour
     Rigidbody2D rb;
     Transform attackPivot;
     WeaponScript weapon;
+    public float AttackCd{get{return attackCd;}set{if(value < 0.1f) attackCd = 0.1f; else attackCd = value;}}
     float rollTimer, attackTimer, attackCd, xinput, yinput;
     Vector3 inputDirection, lookAt;
 

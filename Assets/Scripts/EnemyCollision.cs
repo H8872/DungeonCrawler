@@ -13,19 +13,11 @@ public class EnemyCollision : MonoBehaviour
         rb = transform.parent.GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     private void OnTriggerEnter2D(Collider2D other) {
         if(other.tag == "Weapon")
         {
             WeaponScript wep = other.GetComponent<WeaponScript>();
-            rb.AddForce((transform.position-other.transform.position).normalized * wep.KnockBack,ForceMode2D.Impulse);
-            //enemyState = EnemyState.Hurt;
-            
-            control.Invoke("CheckLiving", 0.5f);
+            control.GetHit(wep.Damage, wep.KnockBack, other.transform.position);
         }
     }
 }
