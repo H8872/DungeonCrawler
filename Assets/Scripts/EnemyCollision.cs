@@ -24,7 +24,7 @@ public class EnemyCollision : MonoBehaviour
             WeaponScript wep = other.GetComponent<WeaponScript>();
             rb.AddForce((transform.position-other.transform.position).normalized * wep.KnockBack,ForceMode2D.Impulse);
             //enemyState = EnemyState.Hurt;
-            //hp -= wep.Damage;
+            
             control.Invoke("CheckLiving", 0.5f);
         }
     }
