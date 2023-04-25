@@ -110,7 +110,7 @@ public class EnemyControl : MonoBehaviour
 
             case EnemyState.Hurt:
                 ai.canMove = false;
-                sprite.color = Color.red;
+                sprite.color = (Time.time % 0.2f < 0.1f) ? Color.red : Color.white;
                 break;
 
             default:

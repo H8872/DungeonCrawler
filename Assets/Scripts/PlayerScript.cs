@@ -91,6 +91,7 @@ public class PlayerScript : MonoBehaviour
                 break;
 
             case PlayerState.Hurt:
+                sprite.color = (Time.time % 0.2f < 0.1f) ? Color.red : Color.white;
                 break;
                 
             default:
@@ -100,7 +101,7 @@ public class PlayerScript : MonoBehaviour
 
         if(Input.GetButtonDown("Jump") && rollTimer <= 0)
         {
-            rb.AddForce(lookAt*moveSpeed*10, ForceMode2D.Impulse);
+            rb.AddForce(lookAt*moveSpeed*15, ForceMode2D.Impulse);
             rollTimer = rollCd;
             playerState = PlayerState.Rolling;
         }
@@ -108,7 +109,6 @@ public class PlayerScript : MonoBehaviour
         
         if(Input.GetButtonDown("Fire1") && attackTimer <= 0)
         {
-            //anim.Play("Gobbo_Attack");
             attackTimer = attackCd;
             playerState = PlayerState.Attacking;
             attackPivot.position = transform.position + lookAt * 0.7f;
