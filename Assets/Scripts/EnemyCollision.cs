@@ -21,7 +21,7 @@ public class EnemyCollision : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D other) {
+    private void OnCollisionStay2D(Collision2D other) {
         Debug.Log(other.gameObject.tag);
         if(other.gameObject.tag == "Player")
         {
