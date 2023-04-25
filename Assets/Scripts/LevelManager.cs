@@ -21,6 +21,8 @@ public class LevelManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(player == null)
+            player = this.transform;
         if(Vector3.Distance(mainCamera.transform.parent.position,player.position)>0.2f)
         mainCamera.transform.parent.position = Vector3.Lerp(mainCamera.transform.parent.position,player.position,6 * Time.deltaTime);
         //MoveCamera(tstx, tsty);

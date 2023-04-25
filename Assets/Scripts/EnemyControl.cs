@@ -5,9 +5,12 @@ using Pathfinding;
 
 public class EnemyControl : MonoBehaviour
 {
+    [SerializeField] bool drawGizmos;
     enum EnemyState {Idle, Chasing, Hurt, Moving}
     [SerializeField] EnemyState enemyState;
-    [SerializeField] float hp, moveSpeed;
+    public float Damage {get{return damage;} set{damage = value;}}
+    public float KnockBack {get{return knockBack;} set{knockBack = value;}}
+    [SerializeField] float hp, moveSpeed, damage, knockBack;
     SpriteRenderer sprite;
     float chaseTimer, chaseMax = 2f, dist;
     GameObject targetObject;
@@ -44,16 +47,31 @@ public class EnemyControl : MonoBehaviour
                 ai.canMove = true;
                 targetObject = gameObject;
                 chaseTimer -= Time.deltaTime;
-                if(playerDetected)
+                if(playerDetected && playerInRange)
                     enemyState = EnemyState.Chasing;
-                if(chaseTimer<0)
+                if(chaseTimer<=0 && playerDetected)
                 {
                     playerDetected = false;
                     moveTo.position = home;
+                    enemyState = EnemyState.Moving;
+                }
+                else if(chaseTimer<=0)
+                {
+                    chaseTimer = chaseMax*2;
+                    if(moveTo.position == home)
+                        moveTo.position = moveTo.position + new Vector3(Random.Range(-1f,1f),Random.Range(-1,1),0);
+                    else
+                        moveTo.position = home;
+                    enemyState = EnemyState.Moving;
                 }
                 break;
 
             case EnemyState.Chasing:
+                if(targetObject == null)
+                {
+                    enemyState = EnemyState.Moving;
+                    break;
+                }
                 ai.canMove = false;
                 moveTo.position = targetObject.transform.position;
                 if(playerInRange)
@@ -70,14 +88,23 @@ public class EnemyControl : MonoBehaviour
                 break;
 
             case EnemyState.Moving:
-                ai.canMove = true;
-                dSetter.target = moveTo;
-                if(ai.reachedEndOfPath)
-                    enemyState = EnemyState.Idle;
                 if(playerInRange)
                 {
                     enemyState = EnemyState.Chasing;
                     break;
+                }
+                if(ai.velocity.magnitude < 0.1f)
+                {
+                    chaseTimer -= Time.deltaTime;
+                    if(chaseTimer <= 0)
+                        enemyState = EnemyState.Idle;
+                }
+                ai.canMove = true;
+                dSetter.target = moveTo;
+                if(ai.reachedEndOfPath)
+                {
+                    enemyState = EnemyState.Idle;
+                    waypoint = transform.position;
                 }
                 break;
 
@@ -183,10 +210,12 @@ public class EnemyControl : MonoBehaviour
     }
 
     private void OnDrawGizmos() {
-
-        // To waypoint
-        Gizmos.color = Color.red;
-        Gizmos.DrawCube(waypoint,new Vector3(0.2f,0.2f,0.2f));
-        Gizmos.DrawLine(transform.position,waypoint);
+        if(drawGizmos)
+        {
+            // To waypoint
+            Gizmos.color = Color.red;
+            Gizmos.DrawCube(waypoint,new Vector3(0.2f,0.2f,0.2f));
+            Gizmos.DrawLine(transform.position,waypoint);
+        }
     }
 }

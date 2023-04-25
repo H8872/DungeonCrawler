@@ -20,4 +20,12 @@ public class EnemyCollision : MonoBehaviour
             control.GetHit(wep.Damage, wep.KnockBack, other.transform.position);
         }
     }
+
+    private void OnCollisionEnter2D(Collision2D other) {
+        Debug.Log(other.gameObject.tag);
+        if(other.gameObject.tag == "Player")
+        {
+            other.gameObject.GetComponent<PlayerScript>().GetHit(control.Damage,control.KnockBack,transform.position);
+        }
+    }
 }

@@ -230,30 +230,12 @@ AnimatorController:
   m_Name: Gobbo_Animator
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: Attack
-    m_Type: 1
-    m_DefaultFloat: 0
-    m_DefaultInt: 0
-    m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
   - m_Name: Walkin
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
-  - m_Name: xInput
-    m_Type: 1
-    m_DefaultFloat: 0
-    m_DefaultInt: 0
-    m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
-  - m_Name: yInput
-    m_Type: 1
-    m_DefaultFloat: 0
-    m_DefaultInt: 0
-    m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
+    m_Controller: {fileID: 0}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -423,7 +405,7 @@ AnimatorStateMachine:
     m_Position: {x: 270, y: 140, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -1296705435766515998}
-    m_Position: {x: 120, y: -120, z: 0}
+    m_Position: {x: 130, y: -120, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -7845471452436422666}
     m_Position: {x: 10, y: -170, z: 0}
@@ -438,7 +420,7 @@ AnimatorStateMachine:
   m_EntryTransitions: []
   m_StateMachineTransitions: {}
   m_StateMachineBehaviours: []
-  m_AnyStatePosition: {x: 80, y: 120, z: 0}
+  m_AnyStatePosition: {x: 80, y: 0, z: 0}
   m_EntryPosition: {x: 80, y: 50, z: 0}
   m_ExitPosition: {x: -460, y: 260, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}

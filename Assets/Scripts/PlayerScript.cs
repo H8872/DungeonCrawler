@@ -4,22 +4,24 @@ using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
-    enum PlayerState {Idle, Hurt, Moving}
+    enum PlayerState {Idle, Hurt, Moving, Rolling, Attacking}
     [SerializeField] PlayerState playerState;
     [SerializeField] float hp, rollCd, moveSpeed;
     Animator anim;
+    SpriteRenderer sprite;
     Rigidbody2D rb;
     Transform attackPivot;
     WeaponScript weapon;
     public float AttackCd{get{return attackCd;}set{if(value < 0.1f) attackCd = 0.1f; else attackCd = value;}}
     float rollTimer, attackTimer, attackCd, xinput, yinput;
-    Vector3 inputDirection, lookAt;
+    [SerializeField] Vector3 inputDirection, lookAt;
 
     // Start is called before the first frame update
     void Start()
     {
         anim = transform.GetComponent<Animator>();
         rb = transform.GetComponent<Rigidbody2D>();
+        sprite = transform.GetComponent<SpriteRenderer>();
         attackPivot = transform.GetChild(0);
         weapon = attackPivot.GetChild(0).GetComponent<WeaponScript>();
         if(weapon == null)
@@ -31,7 +33,6 @@ public class PlayerScript : MonoBehaviour
         }
 
         lookAt = Vector3.right;
-        anim.SetFloat("xInput", Mathf.Round(lookAt.x));
     }
 
     // Update is called once per frame
@@ -44,55 +45,72 @@ public class PlayerScript : MonoBehaviour
         xinput = (Mathf.Round((xinput*10)/5)*5)/10;
         yinput = (Mathf.Round((yinput*10)/5)*5)/10;
 
-
         inputDirection = new Vector3(xinput,yinput);
         inputDirection = Vector3.ClampMagnitude(inputDirection, 1);
-
-        if(inputDirection == Vector3.zero)
-        {
-            playerState = PlayerState.Idle;
-            anim.SetBool("Walkin", false);
-        }
-        else 
-        {
-            playerState = PlayerState.Moving;
-            anim.SetBool("Walkin", true);
-            lookAt = inputDirection.normalized;
-            anim.SetFloat("xInput", Mathf.Round(lookAt.x));
-            anim.SetFloat("yInput", Mathf.Round(lookAt.y));
-        }
-
-
-        if(xinput<0)
-        {
-            transform.GetComponent<SpriteRenderer>().flipX = true;
-            attackPivot.GetChild(0).GetComponent<SpriteRenderer>().flipX = true;
-            
-        }
-        else if(xinput>0)
-        {
-            transform.GetComponent<SpriteRenderer>().flipX = false;
-            attackPivot.GetChild(0).GetComponent<SpriteRenderer>().flipX = false;
-        }
-
         
-        if(rollTimer > 0) rollTimer -= Time.deltaTime;
+
+        switch (playerState)
+        {
+            case PlayerState.Moving:
+                if(inputDirection == Vector3.zero)
+                {
+                    playerState = PlayerState.Idle;
+                    break;
+                }
+                anim.SetBool("Walkin", true);
+                lookAt = inputDirection.normalized;
+                if(xinput<0)
+                {
+                    transform.GetComponent<SpriteRenderer>().flipX = true;
+                    attackPivot.GetChild(0).GetComponent<SpriteRenderer>().flipX = true;
+
+                }
+                else if(xinput>0)
+                {
+                    transform.GetComponent<SpriteRenderer>().flipX = false;
+                    attackPivot.GetChild(0).GetComponent<SpriteRenderer>().flipX = false;
+                }
+                break;
+
+            case PlayerState.Idle:
+                anim.SetBool("Walkin", false);
+                if(inputDirection != Vector3.zero)
+                    playerState = PlayerState.Moving;
+                break;
+
+            case PlayerState.Rolling:
+                rollTimer -= Time.deltaTime;
+                if(rollTimer < 0)
+                    playerState = PlayerState.Idle; 
+                break;
+
+            case PlayerState.Attacking:
+                attackTimer -= Time.deltaTime;
+                if(attackTimer < 0)
+                    playerState = PlayerState.Idle; 
+                break;
+
+            case PlayerState.Hurt:
+                break;
+                
+            default:
+                break;
+        }
+
+
         if(Input.GetButtonDown("Jump") && rollTimer <= 0)
         {
             rb.AddForce(lookAt*moveSpeed*10, ForceMode2D.Impulse);
             rollTimer = rollCd;
+            playerState = PlayerState.Rolling;
         }
 
-        if(attackTimer > 0)
-        {
-            attackTimer -= Time.deltaTime;
-            anim.SetFloat("Attack",0);
-        }
+        
         if(Input.GetButtonDown("Fire1") && attackTimer <= 0)
         {
             //anim.Play("Gobbo_Attack");
             attackTimer = attackCd;
-            anim.SetFloat("Attack",attackTimer);
+            playerState = PlayerState.Attacking;
             attackPivot.position = transform.position + lookAt * 0.7f;
             rb.AddForce(lookAt*moveSpeed*5, ForceMode2D.Impulse);
             if(lookAt.x > 0)
@@ -106,9 +124,33 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
+    void CheckLiving()
+    {
+        if(hp>0)
+        {   
+            playerState = PlayerState.Idle;
+            sprite.color = Color.white;
+        }
+        else
+            Destroy(gameObject);
+    }
+
+    public void GetHit(float dmg, float kb, Vector3 dir)
+    {
+        if(playerState != PlayerState.Hurt)
+        {
+            CancelInvoke("CheckLiving");
+            Invoke("CheckLiving", 0.2f);
+            hp -= dmg;
+            playerState = PlayerState.Hurt;
+            rb.AddForce((transform.position-dir).normalized * kb,ForceMode2D.Impulse);
+        }
+    }
+    
     void FixedUpdate()
     {
-        rb.AddForce(inputDirection * moveSpeed,ForceMode2D.Impulse);
+        if(playerState != PlayerState.Hurt && playerState != PlayerState.Rolling)
+            rb.AddForce(inputDirection * moveSpeed,ForceMode2D.Impulse);
         
     }
 }
