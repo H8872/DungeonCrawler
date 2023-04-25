@@ -74,6 +74,8 @@ public class PlayerScript : MonoBehaviour
 
             case PlayerState.Idle:
                 anim.SetBool("Walkin", false);
+                if(attackTimer > 0)
+                    attackTimer = 0;
                 if(inputDirection != Vector3.zero)
                     playerState = PlayerState.Moving;
                 break;
