@@ -124,6 +124,7 @@ public class EnemyControl : MonoBehaviour
 
     private void FixedUpdate()
     {
+        ai.maxSpeed = moveSpeed * 4;
         if(enemyState != EnemyState.Hurt && enemyState != EnemyState.Moving)
             rb.AddForce((waypoint-transform.position).normalized * moveSpeed,ForceMode2D.Impulse);
 
@@ -207,6 +208,7 @@ public class EnemyControl : MonoBehaviour
         {
             HandleDetection(other.gameObject, false, false);
         }
+        
     }
 
     private void OnDrawGizmos() {

@@ -45,8 +45,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.6, y: 0.3}
+  m_Offset: {x: 0, y: 0.13}
+  m_Size: {x: 0.6, y: 0.51}
   m_Direction: 1
 --- !u!1 &6801810936261929942
 GameObject:
@@ -236,7 +236,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6801810936621243545}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.531, y: 2.474, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -261,6 +261,8 @@ MonoBehaviour:
   hp: 5
   rollCd: 0.5
   moveSpeed: 1.5
+  inputDirection: {x: 0, y: 0, z: 0}
+  lookAt: {x: 0, y: 0, z: 0}
 --- !u!212 &6801810936621243544
 SpriteRenderer:
   m_ObjectHideFlags: 0

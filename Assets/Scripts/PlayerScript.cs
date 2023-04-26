@@ -13,7 +13,8 @@ public class PlayerScript : MonoBehaviour
     Transform attackPivot;
     WeaponScript weapon;
     public float AttackCd{get{return attackCd;}set{if(value < 0.1f) attackCd = 0.1f; else attackCd = value;}}
-    float rollTimer, attackTimer, attackCd, xinput, yinput;
+    public float Keys{get{return keys;}set{keys = value;}}
+    float rollTimer, attackTimer, attackCd, xinput, yinput, keys;
     [SerializeField] Vector3 inputDirection, lookAt;
 
     // Start is called before the first frame update
@@ -74,8 +75,6 @@ public class PlayerScript : MonoBehaviour
 
             case PlayerState.Idle:
                 anim.SetBool("Walkin", false);
-                if(attackTimer > 0)
-                    attackTimer = 0;
                 if(inputDirection != Vector3.zero)
                     playerState = PlayerState.Moving;
                 break;
@@ -93,6 +92,11 @@ public class PlayerScript : MonoBehaviour
                 break;
 
             case PlayerState.Hurt:
+                if(attackTimer > 0 || rollTimer > 0)
+                {
+                    rollTimer = 0;
+                    attackTimer = 0;
+                }
                 sprite.color = (Time.time % 0.2f < 0.1f) ? Color.red : Color.white;
                 break;
                 
@@ -147,6 +151,23 @@ public class PlayerScript : MonoBehaviour
             playerState = PlayerState.Hurt;
             rb.AddForce((transform.position-dir).normalized * kb,ForceMode2D.Impulse);
         }
+    }
+
+    public void AddHP(float add)
+    {
+        Debug.Log(keys);
+        hp += add;
+        if(add>0)
+            sprite.color = Color.green;
+        else
+            sprite.color = Color.yellow;
+        
+        Invoke("CheckLiving", 0.2f);
+    }
+
+    public void AddDMG(float add)
+    {
+        weapon.Damage += add;
     }
     
     void FixedUpdate()

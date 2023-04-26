@@ -25,7 +25,11 @@ public class EnemyCollision : MonoBehaviour
         Debug.Log(other.gameObject.tag);
         if(other.gameObject.tag == "Player")
         {
-            other.gameObject.GetComponent<PlayerScript>().GetHit(control.Damage,control.KnockBack,transform.position);
+            PlayerScript player = other.gameObject.GetComponent<PlayerScript>();
+            if(player == null)
+                player = other.transform.parent.GetComponent<PlayerScript>();
+            
+            player.GetHit(control.Damage,control.KnockBack,transform.position);
         }
     }
 }
