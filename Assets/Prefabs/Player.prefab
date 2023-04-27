@@ -127,8 +127,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damage: 1
-  KnockBack: 10
-  AttackSpeed: 0.6
+  KnockBack: 20
+  AttackSpeed: 0.4
 --- !u!212 &6801810936544982049
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -258,9 +258,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerState: 0
-  hp: 5
+  hp: 4
   rollCd: 0.5
   moveSpeed: 1.5
+  maxHp: 4
   inputDirection: {x: 0, y: 0, z: 0}
   lookAt: {x: 0, y: 0, z: 0}
 --- !u!212 &6801810936621243544

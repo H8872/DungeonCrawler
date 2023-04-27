@@ -1,28 +1,39 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour
 {
     enum PlayerState {Idle, Hurt, Moving, Rolling, Attacking}
     [SerializeField] PlayerState playerState;
-    [SerializeField] float hp, rollCd, moveSpeed;
+    [SerializeField] float hp, rollCd, moveSpeed, maxHp = 4;
+    Slider hpSlider;
     Animator anim;
     SpriteRenderer sprite;
     Rigidbody2D rb;
     Transform attackPivot;
     WeaponScript weapon;
     public float AttackCd{get{return attackCd;}set{if(value < 0.1f) attackCd = 0.1f; else attackCd = value;}}
-    public float Keys{get{return keys;}set{keys = value;}}
+    public float Keys{get{return keys;}set{if(value>0) keys = value; else keys = 0;}}
+    public float Hp {get{return hp;} set{if(value>maxHp) hp = maxHp; else hp = value;}}
     float rollTimer, attackTimer, attackCd, xinput, yinput, keys;
     [SerializeField] Vector3 inputDirection, lookAt;
+    
 
     // Start is called before the first frame update
     void Start()
     {
+        hp = maxHp;
         anim = transform.GetComponent<Animator>();
         rb = transform.GetComponent<Rigidbody2D>();
         sprite = transform.GetComponent<SpriteRenderer>();
+        
+        hpSlider = GameObject.FindWithTag("UI").transform.GetChild(0).GetComponent<Slider>();
+        hpSlider.minValue = 0;
+        hpSlider.maxValue = maxHp;
+        hpSlider.value = Hp;
+
         attackPivot = transform.GetChild(0);
         weapon = attackPivot.GetChild(0).GetComponent<WeaponScript>();
         if(weapon == null)
@@ -30,7 +41,6 @@ public class PlayerScript : MonoBehaviour
         else
         {
             attackCd = weapon.AttackSpeed;
-
         }
 
         lookAt = Vector3.right;
@@ -80,13 +90,11 @@ public class PlayerScript : MonoBehaviour
                 break;
 
             case PlayerState.Rolling:
-                rollTimer -= Time.deltaTime;
                 if(rollTimer < 0)
                     playerState = PlayerState.Idle; 
                 break;
 
             case PlayerState.Attacking:
-                attackTimer -= Time.deltaTime;
                 if(attackTimer < 0)
                     playerState = PlayerState.Idle; 
                 break;
@@ -103,17 +111,23 @@ public class PlayerScript : MonoBehaviour
             default:
                 break;
         }
+        attackTimer -= Time.deltaTime;
+        rollTimer -= Time.deltaTime;
 
 
-        if(Input.GetButtonDown("Jump") && rollTimer <= 0)
+        if(Input.GetButtonDown("Fire2") && rollTimer <= 0)
         {
             rb.AddForce(lookAt*moveSpeed*15, ForceMode2D.Impulse);
             rollTimer = rollCd;
+            if(lookAt.x<0)
+                anim.Play("Gobbo_Roll_Right");
+            else
+                anim.Play("Gobbo_Roll_Left");
             playerState = PlayerState.Rolling;
         }
 
         
-        if(Input.GetButtonDown("Fire1") && attackTimer <= 0)
+        if(Input.GetButtonDown("Fire3") && attackTimer <= 0 && playerState != PlayerState.Rolling)
         {
             attackTimer = attackCd;
             playerState = PlayerState.Attacking;
@@ -128,11 +142,12 @@ public class PlayerScript : MonoBehaviour
             else
                 anim.Play("Gobbo_Attack_Right");
         }
+        hpSlider.value = Hp;
     }
 
     void CheckLiving()
     {
-        if(hp>0)
+        if(Hp>0)
         {   
             playerState = PlayerState.Idle;
             sprite.color = Color.white;
@@ -143,11 +158,11 @@ public class PlayerScript : MonoBehaviour
 
     public void GetHit(float dmg, float kb, Vector3 dir)
     {
-        if(playerState != PlayerState.Hurt)
+        if(playerState != PlayerState.Hurt && playerState != PlayerState.Rolling)
         {
             CancelInvoke("CheckLiving");
-            Invoke("CheckLiving", 0.2f);
-            hp -= dmg;
+            Invoke("CheckLiving", 0.5f);
+            Hp -= dmg;
             playerState = PlayerState.Hurt;
             rb.AddForce((transform.position-dir).normalized * kb,ForceMode2D.Impulse);
         }
@@ -155,8 +170,7 @@ public class PlayerScript : MonoBehaviour
 
     public void AddHP(float add)
     {
-        Debug.Log(keys);
-        hp += add;
+        Hp += add;
         if(add>0)
             sprite.color = Color.green;
         else
@@ -172,7 +186,7 @@ public class PlayerScript : MonoBehaviour
     
     void FixedUpdate()
     {
-        if(playerState != PlayerState.Hurt && playerState != PlayerState.Rolling)
+        if(playerState != PlayerState.Attacking && playerState != PlayerState.Rolling)
             rb.AddForce(inputDirection * moveSpeed,ForceMode2D.Impulse);
         
     }

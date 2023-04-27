@@ -23,25 +23,26 @@ public class CollectableScript : MonoBehaviour
         if(other.tag == "Player" && cType != CollectType.Door)
         {
             PlayerScript player = other.GetComponent<PlayerScript>();
-            if(player == null)
-                player = other.transform.parent.GetComponent<PlayerScript>();
-            if(cType == CollectType.Key)
+            if(player != null)
             {
-                if(cColor == CollectColor.White)
-                    player.Keys += value;
-            }
-            else if(cType == CollectType.Potion)
-            {
-                if(cColor == CollectColor.Red)
+                if(cType == CollectType.Key)
                 {
-                    player.AddHP(value);
+                    if(cColor == CollectColor.White)
+                        player.Keys += value;
                 }
-                else if(cColor == CollectColor.Green)
+                else if(cType == CollectType.Potion)
                 {
-                    player.AddDMG(value);
+                    if(cColor == CollectColor.Red)
+                    {
+                        player.AddHP(value);
+                    }
+                    else if(cColor == CollectColor.Green)
+                    {
+                        player.AddDMG(value);
+                    }
                 }
+                Destroy(gameObject);
             }
-            Destroy(gameObject);
         }
     }
 
@@ -52,7 +53,6 @@ public class CollectableScript : MonoBehaviour
             if(player == null)
                 player = other.transform.parent.GetComponent<PlayerScript>();
 
-            Debug.Log(player.Keys + " vs " + value);
             if(player.Keys >= value)
             {
                 anim.Play("DoorAnim");

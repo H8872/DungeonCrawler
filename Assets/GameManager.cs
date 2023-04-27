@@ -4,17 +4,20 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    enum ScripType {MatrixOfAssets, EnemyNames, None}
+    /*enum ScripType {MatrixOfAssets, EnemyNames, None}
     [SerializeField] ScripType scripType = ScripType.None;
     [SerializeField] List<string> nameList = new List<string>();
     [SerializeField] int length, width;
-    [SerializeField] GameObject cube;
+    [SerializeField] GameObject cube;*/
 
+    public static GameManager instance;
+    LevelManager lvlManager;
+    [SerializeField] GameObject playerPrefab;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake() 
     {
-        // Excersizes (Delete references on final)
+        /*// Excersizes (Delete references on final)
         switch (scripType)
         {
             case ScripType.MatrixOfAssets:
@@ -46,9 +49,16 @@ public class GameManager : MonoBehaviour
             default:
                 break;
         }
-
+        */
         // Game Code
-
+        if(instance != null)
+        {
+            Debug.LogWarning($"More than 1 {instance} active. Deleting this {instance}.");
+            Destroy(gameObject);
+        }
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+        lvlManager = LevelManager.instance;
     }
 
 
@@ -58,6 +68,7 @@ public class GameManager : MonoBehaviour
         
     }
 
+    /*
     void AddName(string name)
     {
         nameList.Add(name);
@@ -74,4 +85,5 @@ public class GameManager : MonoBehaviour
         else
             Debug.Log("No Names to remove");
     }
+    */
 }

@@ -12,9 +12,11 @@ public class EnemyControl : MonoBehaviour
     public float KnockBack {get{return knockBack;} set{knockBack = value;}}
     [SerializeField] float hp, moveSpeed, damage, knockBack;
     SpriteRenderer sprite;
+    CircleCollider2D hitCollider;
     float chaseTimer, chaseMax = 2f, dist;
     GameObject targetObject;
-    Vector3 waypoint, home;
+    Vector3 waypoint;
+    public Vector3 Home;
     bool playerDetected = false, playerInRange = false;
     Rigidbody2D rb;
     AIPath ai;
@@ -25,11 +27,12 @@ public class EnemyControl : MonoBehaviour
     void Start()
     {
         sprite = transform.GetComponent<SpriteRenderer>();
+        hitCollider = transform.GetChild(0).GetComponent<CircleCollider2D>();
         moveTo = new GameObject().transform;
         moveTo.name = gameObject.name + "MoveTo";
         moveTo.position = transform.position;
         waypoint = transform.position;
-        home = transform.position;
+        Home = transform.position;
         rb = transform.GetComponent<Rigidbody2D>();
         dist = transform.GetComponent<CircleCollider2D>().radius;
         ai = transform.GetComponent<AIPath>();
@@ -52,16 +55,16 @@ public class EnemyControl : MonoBehaviour
                 if(chaseTimer<=0 && playerDetected)
                 {
                     playerDetected = false;
-                    moveTo.position = home;
+                    moveTo.position = Home;
                     enemyState = EnemyState.Moving;
                 }
                 else if(chaseTimer<=0)
                 {
                     chaseTimer = chaseMax*2;
-                    if(moveTo.position == home)
+                    if(moveTo.position == Home)
                         moveTo.position = moveTo.position + new Vector3(Random.Range(-1f,1f),Random.Range(-1,1),0);
                     else
-                        moveTo.position = home;
+                        moveTo.position = Home;
                     enemyState = EnemyState.Moving;
                 }
                 break;
@@ -111,6 +114,7 @@ public class EnemyControl : MonoBehaviour
             case EnemyState.Hurt:
                 ai.canMove = false;
                 sprite.color = (Time.time % 0.2f < 0.1f) ? Color.red : Color.white;
+                hitCollider.enabled = false;
                 break;
 
             default:
@@ -158,6 +162,7 @@ public class EnemyControl : MonoBehaviour
 
     void CheckLiving()
     {
+        hitCollider.enabled = true;
         if(hp>0)
         {   
             enemyState = EnemyState.Idle;
