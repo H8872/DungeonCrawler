@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class PlayerScript : MonoBehaviour
 {
-    enum PlayerState {Idle, Hurt, Moving, Rolling, Attacking}
-    [SerializeField] PlayerState playerState;
+    public enum PlayerState {Idle, Hurt, Moving, Rolling, Attacking}
+    public PlayerState playerState;
     [SerializeField] float hp, rollCd, moveSpeed, maxHp = 4;
     Slider hpSlider;
     Animator anim;
