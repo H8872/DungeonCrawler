@@ -71,6 +71,24 @@ public class GameManager : MonoBehaviour
     }
 
     /*
+    ToDo:
+    boss fight
+    more rooms
+    - progressing difficulty on the rooms
+    show weapon damage
+    - in hud prolly close to the health
+    secret hittable wall colliders
+    invincibility/shield power-up for ez debug/gettin through the game
+    - use the yellow potion
+    ?life bars for enemies
+    ?button test on main menu
+    ?speech/intent bubbles
+    ??slime fren tutorie
+    ??use button
+    ??seperate wall colliders for rolling
+    */
+
+    /*
     void AddName(string name)
     {
         nameList.Add(name);
