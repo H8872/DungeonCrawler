@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class StairsScript : MonoBehaviour
 {
-    public int id;
-    [SerializeField] int goToFloor;
+    public int id, goToFloor;
     LevelManager lvlManager;
     SpriteRenderer sprite;
     BoxCollider2D hitBox;

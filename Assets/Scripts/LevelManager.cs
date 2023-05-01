@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
     public static LevelManager instance;
     Transform LevelsRoot;
-    Dictionary<int, Transform> stairsDict = new Dictionary<int, Transform>();
+    public Dictionary<int, Transform> stairsDict = new Dictionary<int, Transform>();
     Camera mainCamera;
     Transform player, cameraRoot;
     float cameraHeight, cameraWidth, xpos, ypos;
@@ -55,6 +56,10 @@ public class LevelManager : MonoBehaviour
         if(Vector3.Distance(mainCamera.transform.parent.position,player.position)>0.2f)
             cameraRoot.position = Vector3.Lerp(mainCamera.transform.parent.position,player.position,6 * Time.deltaTime);
         //MoveCamera(tstx, tsty);
+        if(Input.GetKey(KeyCode.Escape) || Input.GetKey(KeyCode.Joystick1Button7))
+        {
+            SceneManager.LoadScene("MainMenu");
+        }
     }
 
     public void ChangeLevel(int level)

@@ -10,12 +10,14 @@ public class CollectableScript : MonoBehaviour
     [SerializeField] CollectColor cColor;
     [SerializeField] float value;
     Animator anim;
+    AudioSource source;
     // Start is called before the first frame update
     void Start()
     {
         if(cType == CollectType.Door)
         {
             anim = transform.GetComponent<Animator>();
+            source = transform.GetComponent<AudioSource>();
         }
     }
 
@@ -28,26 +30,38 @@ public class CollectableScript : MonoBehaviour
                 if(cType == CollectType.Key)
                 {
                     if(cColor == CollectColor.White)
-                        player.Keys += value;
+                        player.AddKey(value); 
+                    Destroy(gameObject);
                 }
                 else if(cType == CollectType.Potion)
                 {
-                    if(cColor == CollectColor.Red)
+                    switch (cColor)
                     {
-                        player.AddHP(value);
-                    }
-                    else if(cColor == CollectColor.Green)
-                    {
-                        player.AddDMG(value);
+                        case CollectColor.White:
+                            player.GiveInvuln(value);
+                            Destroy(gameObject);
+                            break;
+                        case CollectColor.Red:
+                            if(player.Hp < 4)
+                            {
+                                player.AddHP(value);
+                                Destroy(gameObject);
+                            }
+                            break;
+                        case CollectColor.Green:
+                            player.AddDMG(value);
+                            Destroy(gameObject);
+                            break;
+                        default:
+                            break;
                     }
                 }
-                Destroy(gameObject);
             }
         }
     }
 
     private void OnCollisionStay2D(Collision2D other) {
-        if(other.transform.tag == "Player")
+        if(other.transform.tag == "Player" && !source.isPlaying)
         {
             PlayerScript player = other.transform.GetComponent<PlayerScript>();
             if(player == null)
@@ -56,6 +70,7 @@ public class CollectableScript : MonoBehaviour
             if(player.Keys >= value)
             {
                 anim.Play("DoorAnim");
+                source.Play();
             }
         }
     }

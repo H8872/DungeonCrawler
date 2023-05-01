@@ -1,16 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    /*enum ScripType {MatrixOfAssets, EnemyNames, None}
-    [SerializeField] ScripType scripType = ScripType.None;
-    [SerializeField] List<string> nameList = new List<string>();
-    [SerializeField] int length, width;
-    [SerializeField] GameObject cube;*/
-
     public static GameManager instance;
     LevelManager lvlManager;
     [SerializeField] GameObject playerPrefab;
@@ -19,40 +12,6 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Awake() 
     {
-        /*// Excersizes (Delete references on final)
-        switch (scripType)
-        {
-            case ScripType.MatrixOfAssets:
-                for (int x = 0; x < length; x++)
-                {
-                    for (int y = 0; y < width; y++)
-                    {
-                        Instantiate(cube, new Vector3(x,y,0), transform.rotation);
-                    }
-                }
-                break;
-            case ScripType.EnemyNames:
-                for (int i = 0; i < length; i++)
-                {
-                    AddName("Name"+i);
-                }
-                for (int i = 0; i < width; i++)
-                {
-                    RemoveLastName();
-                }
-                foreach(string s in nameList)
-                {
-                    if(s[0] == 'S' || s[0] == 's')
-                    {
-                        Debug.Log(s);
-                    }
-                }
-                break;
-            default:
-                break;
-        }
-        */
-        // Game Code
         if(instance != null)
         {
             Debug.LogWarning($"More than 1 {instance} active. Deleting this {instance}.");
@@ -72,38 +31,14 @@ public class GameManager : MonoBehaviour
 
     /*
     ToDo:
-    boss fight
-    more rooms
-    - progressing difficulty on the rooms
-    show weapon damage
-    - in hud prolly close to the health
+    death handling
+    boss fights
     secret hittable wall colliders
-    invincibility/shield power-up for ez debug/gettin through the game
-    - use the yellow potion
     ?life bars for enemies
     ?button test on main menu
     ?speech/intent bubbles
     ??slime fren tutorie
     ??use button
-    ??seperate wall colliders for rolling
-    */
-
-    /*
-    void AddName(string name)
-    {
-        nameList.Add(name);
-        Debug.Log($"Added {name}. Now there are {nameList.Count} names.");
-    }
-
-    void RemoveLastName()
-    {
-        if(nameList.Count>0)
-        {
-            Debug.Log($"Removed {nameList[nameList.Count-1]}");
-            nameList.RemoveAt(nameList.Count-1);
-        }
-        else
-            Debug.Log("No Names to remove");
-    }
+    ??seperate wall colliders for rolling to roll through enemies
     */
 }

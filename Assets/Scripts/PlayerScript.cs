@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -9,16 +10,21 @@ public class PlayerScript : MonoBehaviour
     public PlayerState playerState;
     [SerializeField] float hp, rollCd, moveSpeed, maxHp = 4;
     Slider hpSlider;
+    TextMeshProUGUI weaponDmgText;
     Animator anim;
+    AudioSource aSource;
+    [SerializeField] AudioClip attackClip, hpUpClip, rollClip, hitClip, keyClip, invulnClip, dmgUpClip;
     SpriteRenderer sprite;
     Rigidbody2D rb;
     Transform attackPivot;
     WeaponScript weapon;
     public float AttackCd{get{return attackCd;}set{if(value < 0.1f) attackCd = 0.1f; else attackCd = value;}}
     public float Keys{get{return keys;}set{if(value>0) keys = value; else keys = 0;}}
-    public float Hp {get{return hp;} set{if(value>maxHp) hp = maxHp; else hp = value;}}
-    float rollTimer, attackTimer, attackCd, xinput, yinput, keys;
-    [SerializeField] Vector3 inputDirection, lookAt;
+    public float Hp {get{return hp;} set{if(value>maxHp) hp = maxHp; else { if(!isInvuln) hp = value;}}}
+    float rollTimer, invultTimer, attackTimer, attackCd, xinput, yinput, keys;
+    bool isInvuln = false;
+    [SerializeField] bool cheats = false;
+    Vector3 inputDirection, lookAt;
     
 
     // Start is called before the first frame update
@@ -28,11 +34,13 @@ public class PlayerScript : MonoBehaviour
         anim = transform.GetComponent<Animator>();
         rb = transform.GetComponent<Rigidbody2D>();
         sprite = transform.GetComponent<SpriteRenderer>();
+        aSource = transform.GetComponent<AudioSource>();
         
         hpSlider = GameObject.FindWithTag("UI").transform.GetChild(0).GetComponent<Slider>();
         hpSlider.minValue = 0;
         hpSlider.maxValue = maxHp;
         hpSlider.value = Hp;
+
 
         attackPivot = transform.GetChild(0);
         weapon = attackPivot.GetChild(0).GetComponent<WeaponScript>();
@@ -42,6 +50,8 @@ public class PlayerScript : MonoBehaviour
         {
             attackCd = weapon.AttackSpeed;
         }
+        weaponDmgText = GameObject.FindWithTag("UI").transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>();
+        weaponDmgText.text = "Lvl:"+weapon.Damage.ToString("00");
 
         lookAt = Vector3.right;
     }
@@ -49,6 +59,8 @@ public class PlayerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(cheats)
+            hp = 4;
 
         xinput = Input.GetAxisRaw("Horizontal");
         yinput = Input.GetAxisRaw("Vertical");
@@ -72,13 +84,13 @@ public class PlayerScript : MonoBehaviour
                 lookAt = inputDirection.normalized;
                 if(xinput<0)
                 {
-                    transform.GetComponent<SpriteRenderer>().flipX = true;
+                    sprite.flipX = true;
                     attackPivot.GetChild(0).GetComponent<SpriteRenderer>().flipX = true;
 
                 }
                 else if(xinput>0)
                 {
-                    transform.GetComponent<SpriteRenderer>().flipX = false;
+                    sprite.flipX = false;
                     attackPivot.GetChild(0).GetComponent<SpriteRenderer>().flipX = false;
                 }
                 break;
@@ -100,23 +112,36 @@ public class PlayerScript : MonoBehaviour
                 break;
 
             case PlayerState.Hurt:
-                if(attackTimer > 0 || rollTimer > 0)
-                {
-                    rollTimer = 0;
-                    attackTimer = 0;
-                }
+                rollTimer = 0;
+                attackTimer = 0;
                 sprite.color = (Time.time % 0.2f < 0.1f) ? Color.red : Color.white;
                 break;
                 
             default:
                 break;
         }
-        attackTimer -= Time.deltaTime;
-        rollTimer -= Time.deltaTime;
+
+        if(attackTimer>0)
+            attackTimer -= Time.deltaTime;
+        if(rollTimer>0)
+            rollTimer -= Time.deltaTime;
+        if(invultTimer>0)
+        {
+            invultTimer -= Time.deltaTime;
+            if(invultTimer<3)
+                sprite.color = (Time.time % 0.5f < 0.25f) ? Color.black : Color.white;
+            else
+                sprite.color = Color.black;
+        }
+        else
+            isInvuln = false;
+
 
 
         if(Input.GetButtonDown("Fire2") && rollTimer <= 0)
         {
+            aSource.clip = rollClip;
+            aSource.Play();
             rb.AddForce(lookAt*moveSpeed*15, ForceMode2D.Impulse);
             rollTimer = rollCd;
             if(lookAt.x<0)
@@ -129,6 +154,8 @@ public class PlayerScript : MonoBehaviour
         
         if(Input.GetButtonDown("Fire3") && attackTimer <= 0 && playerState != PlayerState.Rolling)
         {
+            aSource.clip = attackClip;
+            aSource.Play();
             attackTimer = attackCd;
             playerState = PlayerState.Attacking;
             attackPivot.position = transform.position + lookAt * 0.7f;
@@ -149,6 +176,7 @@ public class PlayerScript : MonoBehaviour
     {
         if(Hp>0)
         {   
+            invultTimer = 0;
             playerState = PlayerState.Idle;
             sprite.color = Color.white;
         }
@@ -160,6 +188,8 @@ public class PlayerScript : MonoBehaviour
     {
         if(playerState != PlayerState.Hurt && playerState != PlayerState.Rolling)
         {
+            aSource.clip = hitClip;
+            aSource.Play();
             CancelInvoke("CheckLiving");
             Invoke("CheckLiving", 0.5f);
             Hp -= dmg;
@@ -170,18 +200,39 @@ public class PlayerScript : MonoBehaviour
 
     public void AddHP(float add)
     {
+        aSource.clip = hpUpClip;
+        aSource.Play();
         Hp += add;
         if(add>0)
             sprite.color = Color.green;
         else
             sprite.color = Color.yellow;
         
-        Invoke("CheckLiving", 0.2f);
+        Invoke("CheckLiving", 0.3f);
+    }
+
+    public void AddKey(float add)
+    {
+        aSource.clip = keyClip;
+        aSource.Play();
+        keys += add;
+    }
+
+    public void GiveInvuln(float time)
+    {
+        aSource.clip = invulnClip;
+        aSource.Play();
+        invultTimer = time;
+        isInvuln = true;
+        Invoke("CheckLiving", time);
     }
 
     public void AddDMG(float add)
     {
+        aSource.clip = dmgUpClip;
+        aSource.Play();
         weapon.Damage += add;
+        weaponDmgText.text = "Lvl:"+weapon.Damage.ToString("00");
     }
     
     void FixedUpdate()

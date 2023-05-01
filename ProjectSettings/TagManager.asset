@@ -10,6 +10,11 @@ TagManager:
   - UI
   - Levels
   - Stairs
+  - Boss
+  - SlimeBoss
+  - KnightBoss
+  - SlimeBossMinion
+  - KnightBossMinion
   layers:
   - Default
   - TransparentFX
