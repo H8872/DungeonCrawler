@@ -30,7 +30,7 @@ public class LevelManager : MonoBehaviour
             Debug.LogWarning("No player found in " + this);
         LevelsRoot = GameObject.FindWithTag("Levels").transform;
         mainCamera = Camera.main;
-        Screen.SetResolution(560,400,false);
+        Screen.SetResolution(1120,800,false);
         cameraHeight = mainCamera.orthographicSize * 2;
         cameraWidth = cameraHeight * mainCamera.aspect;
         cameraRoot = mainCamera.transform.parent;
