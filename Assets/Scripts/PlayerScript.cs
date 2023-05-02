@@ -207,7 +207,10 @@ public class PlayerScript : MonoBehaviour
         aSource.clip = hpUpClip;
         aSource.Play();
         if(invultTimer>0)
+        {
+            isInvuln = false;
             CheckLiving();
+        }
         Hp += add;
         if(add>0)
             sprite.color = Color.green;
