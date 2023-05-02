@@ -169,6 +169,10 @@ public class PlayerScript : MonoBehaviour
             else
                 anim.Play("Gobbo_Attack_Right");
         }
+        if(Input.GetKeyDown(KeyCode.Joystick1Button5) || Input.GetKeyDown(KeyCode.Q))
+            cheats = (cheats) ? cheats = false : cheats = true;
+        if(Input.GetKeyDown(KeyCode.Joystick1Button4) || Input.GetKeyDown(KeyCode.W))
+            AddDMG(1);
         hpSlider.value = Hp;
     }
 
