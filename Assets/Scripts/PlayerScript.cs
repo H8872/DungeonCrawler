@@ -24,7 +24,7 @@ public class PlayerScript : MonoBehaviour
     float rollTimer, invultTimer, attackTimer, attackCd, xinput, yinput, keys;
     bool isInvuln = false;
     [SerializeField] bool cheats = false;
-    Vector3 inputDirection, lookAt;
+    public Vector3 inputDirection, lookAt;
     
 
     // Start is called before the first frame update
