@@ -171,7 +171,7 @@ public class PlayerScript : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.Joystick1Button5) || Input.GetKeyDown(KeyCode.Q))
             cheats = (cheats) ? cheats = false : cheats = true;
-        if(Input.GetKeyDown(KeyCode.Joystick1Button4) || Input.GetKeyDown(KeyCode.W))
+        if(Input.GetKeyDown(KeyCode.Joystick1Button4) || Input.GetKeyDown(KeyCode.E))
             AddDMG(1);
         hpSlider.value = Hp;
     }

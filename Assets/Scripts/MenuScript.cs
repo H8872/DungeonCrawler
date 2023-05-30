@@ -12,7 +12,7 @@ public class MenuScript : MonoBehaviour
     {
         GM = GameManager.instance;
         LM = LevelManager.instance;
-        Screen.SetResolution(1120,800,false);
+        //Screen.SetResolution(560,400,false);
     }
 
     // Update is called once per frame
