@@ -8550,6 +8550,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: SlimeFren
       objectReference: {fileID: 0}
+    - target: {fileID: 5946773950368413436, guid: d8469ece523527549a505adce76fee59, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5946773950368413436, guid: d8469ece523527549a505adce76fee59, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d8469ece523527549a505adce76fee59, type: 3}
 --- !u!1001 &676629519
@@ -32453,7 +32461,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 28.1, y: 53.1}
+  m_AnchoredPosition: {x: 28.099976, y: 53.100006}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1431196917

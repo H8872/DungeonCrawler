@@ -22,5 +22,9 @@ public class MenuScript : MonoBehaviour
         {
             SceneManager.LoadScene("DungeonScene");
         }
+        else if(Input.GetKey(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 }
